@@ -49,7 +49,7 @@ class MovieTheaterApp extends JFrame {
             theaterButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     showTheaterDetails(theaterIndex);
-                    //pooja local host is connected
+                    // pooja local host is connected
                 }
             });
         }
