@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 class MovieTheaterApp extends JFrame {
 
     String[][] theaterData = {
-            { "Bollywood Multilpex, Kharadi", "10:00 AM", "12:00 AM", "Mission Mangal", "Avengers", "Interstellar" },
+            { "Bollywood Multilpex, Kharadi", "10:00 AM", "12:00 PM", "Mission Mangal", "Avengers", "Interstellar" },
             { "INOX PVR, Aundh", "11:00 AM", "01:00 AM", "Matrix", "Titanic", "P.K" },
             { "Pheonix PVR Cinemas, Vimannagar", "09:30 AM", "11:30 PM", "Golmaal", "Toy Story", "The Lion King" },
             { "Mangala Cinema, Pune", "10:30 AM", "12:30 AM", "Batman", "Jackpot", "Wonder Woman" },
@@ -56,19 +56,34 @@ class MovieTheaterApp extends JFrame {
 
     public void showTheaterDetails(int theaterIndex) {
         JFrame detailFrame = new JFrame(theaterData[theaterIndex][0] + " Details");
-
+        JLabel JLabel1, JLabel2, JLabel3;
+        JLabel1 = new JLabel(("Theater Name: " + theaterData[theaterIndex][0]));
+        JLabel2 = new JLabel(("Theater Open Time: " + theaterData[theaterIndex][1]));
+        JLabel3 = new JLabel(("Theater Cose Time: " + theaterData[theaterIndex][2]));
         detailFrame.setSize(700, 500);
-        detailFrame.setLayout(new GridLayout(6, 1));
 
-        // detailFrame.setFont(new Font("Serif", Font.BOLD,30));
+        detailFrame.setLayout(null);
+        detailFrame.setDefaultCloseOperation(HIDE_ON_CLOSE);
+        detailFrame.setFont(new Font("Arial", Font.BOLD, 50));
 
-        detailFrame.add(new JLabel("Theater Name: " + theaterData[theaterIndex][0]));
-        detailFrame.add(new JLabel("Opening Time: " + theaterData[theaterIndex][1]));
-        detailFrame.add(new JLabel("Closing Time: " + theaterData[theaterIndex][2]));
-
+        detailFrame.add(JLabel1);
+        detailFrame.add(JLabel2);
+        detailFrame.add(JLabel3);
+        JLabel1.setBounds(20, 20, 500, 50); // Theater Name
+        JLabel2.setBounds(20, 60, 500, 50); // Opening Time
+        JLabel3.setBounds(20, 100, 500, 50); // Closing Time
+        JButton b1[] = new JButton[6]; // Initialize the array
+        b1[3] = new JButton("BOOK");
+        b1[4] = new JButton("BOOK");
+        b1[5] = new JButton("BOOK");
         for (int i = 3; i < 6; i++) {
-            detailFrame.add(
-                    new JLabel("Movie: " + theaterData[theaterIndex][i] + " at " + movieTimings[theaterIndex][i - 3]));
+            JLabel movieLabel = new JLabel(
+                    "Movie: " + theaterData[theaterIndex][i] + " at " + movieTimings[theaterIndex][i - 3]);
+            movieLabel.setBounds(20, 140 + (i - 3) * 40, 400, 50); // Adjusting vertical placement for each movie
+            b1[i].setBounds(450, 160 + (i - 3) * 40, 80, 20);
+            detailFrame.add(movieLabel);
+            detailFrame.add(b1[i]);
+
         }
 
         detailFrame.setVisible(true);
@@ -78,6 +93,6 @@ class MovieTheaterApp extends JFrame {
 
 public class MainProgram {
     public static void main(String[] ajp) {
-        // new MovieTheaterApp(); // ---- call this model when it reqiure
+        new MovieTheaterApp(); // ---- call this model when it reqiure
     }
 }
