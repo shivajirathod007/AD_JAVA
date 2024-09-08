@@ -1,9 +1,20 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-class MovieTheaterApp extends JFrame {
+interface InnerMainProgram {
+
+    JButton b1[] = new JButton[6]; // Initialize the array
+    JButton BOOK_THE_SEAT = new JButton("BOOk_SELECTED_SEAT");
+    JLabel label1 = new JLabel();
+
+    public List<String> selectedSeats = new ArrayList<>();
+}
+
+class MovieTheaterApp extends JFrame implements InnerMainProgram, ActionListener {
 
     String[][] theaterData = {
             { "Bollywood Multilpex, Kharadi", "10:00 AM", "12:00 PM", "Mission Mangal", "Avengers", "Interstellar" },
@@ -73,7 +84,6 @@ class MovieTheaterApp extends JFrame {
         JLabel1.setBounds(20, 20, 500, 50); // Theater Name
         JLabel2.setBounds(20, 60, 500, 50); // Opening Time
         JLabel3.setBounds(20, 100, 500, 50); // Closing Time
-        JButton b1[] = new JButton[6]; // Initialize the array
         b1[3] = new JButton("BOOK");
         b1[4] = new JButton("BOOK");
         b1[5] = new JButton("BOOK");
@@ -84,16 +94,92 @@ class MovieTheaterApp extends JFrame {
             b1[i].setBounds(450, 160 + (i - 3) * 40, 80, 20);
             detailFrame.add(movieLabel);
             detailFrame.add(b1[i]);
+            b1[i].addActionListener(this);
 
         }
 
         detailFrame.setVisible(true);
     }
 
+    public void actionPerformed(ActionEvent ae) {
+        if (ae.getSource() == b1[3] || ae.getSource() == b1[4] || ae.getSource() == b1[5]) {
+            new SeatSelection();
+        }
+    }
+
 }
 
-public class MainProgram {
-    public static void main(String[] ajp) {
-        new MovieTheaterApp(); // ---- call this model when it reqiure
+class SeatSelection extends JFrame implements InnerMainProgram, ActionListener {
+    private static final int ROWS = 7;
+    private static final int COLS = 7;
+
+    // 2D array of JButtons to represent the seats
+    private JButton[][] seats = new JButton[ROWS][COLS];
+
+    SeatSelection() {
+        setTitle("Seat Selection");
+        setSize(700, 700);
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        setLayout(new GridLayout(ROWS, COLS, 10, 10)); // Create a grid layout for the seats
+
+        // Create and add buttons to the frame
+        for (int row = 0; row < ROWS; row++) {
+            for (int col = 0; col < COLS - 2; col++) {
+                seats[row][col] = new JButton("Seat " + (row * COLS + col + 1)); // Button label
+                seats[row][col].setBackground(Color.LIGHT_GRAY); // Default background color
+
+                seats[row][col].addActionListener(new SeatSelectionHandler());
+
+                add(seats[row][col]); // Add button to JFrame
+
+            }
+
+        }
+        add(BOOK_THE_SEAT);
+        BOOK_THE_SEAT.addActionListener(this);
+        add(label1);
+        label1.setBounds(10, 600, 200, 50);
+        setVisible(true);
+
     }
+
+    private class SeatSelectionHandler implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JButton selectedButton = (JButton) e.getSource();
+
+            if (selectedButton.getBackground() == Color.LIGHT_GRAY) {
+                selectedButton.setBackground(Color.GREEN); // Mark as selected
+                selectedSeats.add(selectedButton.getText());
+            } else {
+                selectedButton.setBackground(Color.LIGHT_GRAY); // Deselect
+                selectedSeats.remove(selectedButton.getText());
+            }
+            String str = "";
+            str += selectedButton.getText();
+            label1.setText("You have selceted : " + str);
+
+        }
+
+    }
+
+    public class MainProgram {
+        public static void main(String[] ajp) {
+            new MovieTheaterApp(); // ---- call this model when it reqiure
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == BOOK_THE_SEAT) {
+            // Show a message dialog with all the selected seats
+            if (selectedSeats.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No seats selected!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Successfully BOOKED: " + String.join(", ", selectedSeats));
+            }
+        }
+
+    }
+
 }
