@@ -1,4 +1,5 @@
 import javax.swing.*;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,12 +13,39 @@ interface InnerMainProgram {
     JLabel label1 = new JLabel();
 
     public List<String> selectedSeats = new ArrayList<>();
+
+}
+
+class JprogressBar {
+    JProgressBar jb;
+    int i = 0, num = 0;
+
+    JprogressBar() {
+        jb = new JProgressBar(SwingConstants.HORIZONTAL, 0, 100);
+        jb.setBounds(40, 40, 160, 30);
+        jb.setValue(0);
+        jb.setStringPainted(true);
+
+    }
+
+    public void iterate() {
+        jb.setVisible(true);
+        while (i <= 100) {
+            jb.setValue(i);
+            i = i + 10;
+            try {
+                Thread.sleep(10);
+            } catch (Exception e) {
+            }
+        }
+    }
 }
 
 class MovieTheaterApp extends JFrame implements InnerMainProgram, ActionListener {
 
     String[][] theaterData = {
-            { "Bollywood Multilpex, Kharadi", "10:00 AM", "12:00 PM", "Mission Mangal", "Avengers", "Interstellar" },
+            { "Bollywood Multilpex, Kharadi", "10:00 AM", "12:00 PM", "Mission Mangal", "Avengers",
+                    "Interstellar" },
             { "INOX PVR, Aundh", "11:00 AM", "01:00 AM", "Matrix", "Titanic", "P.K" },
             { "Pheonix PVR Cinemas, Vimannagar", "09:30 AM", "11:30 PM", "Golmaal", "Toy Story", "The Lion King" },
             { "Mangala Cinema, Pune", "10:30 AM", "12:30 AM", "Batman", "Jackpot", "Wonder Woman" },
@@ -77,7 +105,9 @@ class MovieTheaterApp extends JFrame implements InnerMainProgram, ActionListener
         detailFrame.setLayout(null);
         detailFrame.setDefaultCloseOperation(HIDE_ON_CLOSE);
         detailFrame.setFont(new Font("Arial", Font.BOLD, 50));
-
+        JLabel1.setFont(new Font("Arial", Font.BOLD, 15));
+        JLabel2.setFont(new Font("Arial", Font.BOLD, 15));
+        JLabel3.setFont(new Font("Arial", Font.BOLD, 15));
         detailFrame.add(JLabel1);
         detailFrame.add(JLabel2);
         detailFrame.add(JLabel3);
@@ -90,8 +120,10 @@ class MovieTheaterApp extends JFrame implements InnerMainProgram, ActionListener
         for (int i = 3; i < 6; i++) {
             JLabel movieLabel = new JLabel(
                     "Movie: " + theaterData[theaterIndex][i] + " at " + movieTimings[theaterIndex][i - 3]);
-            movieLabel.setBounds(20, 140 + (i - 3) * 40, 400, 50); // Adjusting vertical placement for each movie
-            b1[i].setBounds(450, 160 + (i - 3) * 40, 80, 20);
+            movieLabel.setBounds(20, 160 + (i - 3) * 40, 400, 50);
+            movieLabel.setFont(new Font("Britannic Bold", Font.PLAIN, 22));
+            movieLabel.setForeground(Color.RED);
+            b1[i].setBounds(450, 180 + (i - 3) * 40, 80, 20);
             detailFrame.add(movieLabel);
             detailFrame.add(b1[i]);
             b1[i].addActionListener(this);
@@ -109,37 +141,73 @@ class MovieTheaterApp extends JFrame implements InnerMainProgram, ActionListener
 
 }
 
-class SeatSelection extends JFrame implements InnerMainProgram, ActionListener {
+class SeatSelection extends JFrame implements InnerMainProgram {
     private static final int ROWS = 7;
     private static final int COLS = 7;
 
     // 2D array of JButtons to represent the seats
     private JButton[][] seats = new JButton[ROWS][COLS];
+    private JButton backButton = new JButton("Back");
+
+    private JProgressBar progressBar = new JProgressBar(0, 100);
 
     SeatSelection() {
         setTitle("Seat Selection");
         setSize(700, 700);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        setLayout(new GridLayout(ROWS, COLS, 10, 10)); // Create a grid layout for the seats
+        setLayout(null);
 
-        // Create and add buttons to the frame
+        int seatnum = 1;
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLS - 2; col++) {
-                seats[row][col] = new JButton("Seat " + (row * COLS + col + 1)); // Button label
-                seats[row][col].setBackground(Color.LIGHT_GRAY); // Default background color
+                seats[row][col] = new JButton("seat: " + seatnum);
+                seats[row][col].setBackground(Color.DARK_GRAY);
+                seats[row][col].setForeground(Color.WHITE);
+                // seats[row][col].setFont(new Font("Copperplate Gothic Bold", Font.BOLD, 30));
+
+                seats[row][col].setBounds(50 + col * 80, 50 + row * 60, 80, 50);
 
                 seats[row][col].addActionListener(new SeatSelectionHandler());
 
-                add(seats[row][col]); // Add button to JFrame
-
+                add(seats[row][col]);
+                seatnum++;
             }
 
         }
         add(BOOK_THE_SEAT);
-        BOOK_THE_SEAT.addActionListener(this);
+        BOOK_THE_SEAT.setBounds(400, 500, 200, 50);
         add(label1);
-        label1.setBounds(10, 600, 200, 50);
+        // label1.setBounds(20, 600, 400, 50);
+
         setVisible(true);
+
+        backButton.setBounds(50, 500, 100, 50);
+
+        add(backButton);
+        backButton.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent aEvent) {
+
+                dispose();
+
+            }
+        });
+
+        BOOK_THE_SEAT.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    progressBar.setBounds(200, 570, 300, 30);
+                    progressBar.setStringPainted(true);
+                    add(progressBar);
+                    new ProgressWorker().execute();
+                } catch (Exception ee) {
+                    System.out.println(e);
+                }
+
+            }
+        });
 
     }
 
@@ -148,38 +216,53 @@ class SeatSelection extends JFrame implements InnerMainProgram, ActionListener {
         public void actionPerformed(ActionEvent e) {
             JButton selectedButton = (JButton) e.getSource();
 
-            if (selectedButton.getBackground() == Color.LIGHT_GRAY) {
+            if (selectedButton.getBackground() == Color.DARK_GRAY) {
                 selectedButton.setBackground(Color.GREEN); // Mark as selected
                 selectedSeats.add(selectedButton.getText());
             } else {
-                selectedButton.setBackground(Color.LIGHT_GRAY); // Deselect
+                selectedButton.setBackground(Color.DARK_GRAY); // Deselect
                 selectedSeats.remove(selectedButton.getText());
             }
-            String str = "";
-            str += selectedButton.getText();
-            label1.setText("You have selceted : " + str);
 
+            label1.setText("tatal payment is ($500 for each seat)  : " + (selectedSeats.size()) * 500);
+            label1.setBounds(10, 600, 400, 50);
         }
 
     }
 
+    class ProgressWorker extends SwingWorker<Void, Integer> {
+        @Override
+        protected Void doInBackground() throws Exception {
+            for (int i = 0; i <= 100; i += 10) {
+                Thread.sleep(100); // Simulate time-consuming task
+                publish(i);
+                progressBar.setString(Integer.toString(i) + "%");
+            }
+            return null;
+        }
+
+        @Override
+        protected void process(List<Integer> chunks) {
+            for (Integer chunk : chunks) {
+                progressBar.setValue(chunk); // Update the progress bar value
+            }
+        }
+
+        @Override
+        protected void done() {
+            // When the task is complete, show a dialog
+            JOptionPane.showMessageDialog(SeatSelection.this, "Payment dones...");
+            progressBar.setValue(0);
+            progressBar.setVisible(false);
+
+            BOOK_THE_SEAT.setEnabled(true);
+        }
+    }
+
+    // main method
     public class MainProgram {
         public static void main(String[] ajp) {
             new MovieTheaterApp(); // ---- call this model when it reqiure
         }
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == BOOK_THE_SEAT) {
-            // Show a message dialog with all the selected seats
-            if (selectedSeats.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No seats selected!");
-            } else {
-                JOptionPane.showMessageDialog(this, "Successfully BOOKED: " + String.join(", ", selectedSeats));
-            }
-        }
-
-    }
-
 }
