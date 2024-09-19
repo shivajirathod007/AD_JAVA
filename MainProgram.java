@@ -79,6 +79,6 @@ class MovieTheaterApp extends JFrame {
 
 public class MainProgram {
     public static void main(String[] ajp) {
-        // new MovieTheaterApp(); // ---- call this model when it reqiure
+         new MovieTheaterApp(); 
     }
 }
